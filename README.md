@@ -1,29 +1,32 @@
 # tinypile
 
-Pile of various tiny (single- or two-file) libs.
+> 该仓库clone自 [fgenesis/tinypile](https://github.com/fgenesis/tinypile)\
+> 对其中的jps进行注释，用于了解jps的实现。
 
-- [x] Cross-platform C/C++.
-- [x] Public Domain.
-- [X] Self-contained.
-- [x] No exceptions, no RTTI, full control over memory allocation.
-- [x] No build system, no hassle.
+各种微型（单文件或双文件）库的集合。
 
-|Thing|Files|Language|Summary|Status|
+- [x] 跨平台 C/C++。
+- [x] 公共领域。
+- [X] 独立自足。
+- [x] 无异常，无 RTTI，完全控制内存分配。
+- [x] 无构建系统，无麻烦。
+
+|项目|文件|语言|概述|状态|
 |:------|:-------|:-----|:-----|:-----|
-|LuaAlloc|[.c](luaalloc.c) + [.h](luaalloc.h)|C99|Lua small block allocator| Stable.
-|JPS v2|[.hh](jps.hh)|C++98|2D Pathfinding: A*, Jump Point Search| Experimental, needs testing.
+|LuaAlloc|[.c](luaalloc.c) + [.h](luaalloc.h)|C99|Lua 小块分配器|稳定版|
+|JPS v2|[.hh](jps.hh)|C++98|2D 寻路：A*、跳点搜索|实验版，需要测试|
 
-My other tiny libs that reside in their own repos for historical reasons:
+由于历史原因，我的其他微型库位于独立仓库中：
 
-|Thing|Language|Summary|
+|项目|语言|概述|
 |:------|:-------|:-----|
-|[JPS](https://github.com/fgenesis/jps) (old version)|C++03|Jump point search (2D Pathfinding)|
-|[minihttp](https://github.com/fgenesis/minihttp)|C++03|HTTP(S) client lib|
+|[JPS](https://github.com/fgenesis/jps)（旧版）|C++03|跳点搜索（2D 寻路）|
+|[minihttp](https://github.com/fgenesis/minihttp)|C++03|HTTP(S) 客户端库|
 
 
 
 
-## Inspired by:
+## 灵感来源：
 
-- The infamous [nothings/stb](https://github.com/nothings/stb/)
+- 著名的 [nothings/stb](https://github.com/nothings/stb/)
 - [r-lyeh/tinybits](https://github.com/r-lyeh/tinybits)

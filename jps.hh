@@ -755,10 +755,10 @@ public:
     inline void fixNode(const Node& n) {
         const unsigned ni = _storageRef.getindex(&n);
         const unsigned sz = idxHeap.size();
-        unsigned* p = idxHeap.data();
+        unsigned* p = idxHeap.data();      // 获取堆数据
         for (unsigned i = 0; i < sz; ++i)  // TODO: 如果这成为性能瓶颈：使每个节点都知道它的堆索引
             if (p[i] == ni) {
-                _fixIdx(i);
+                _fixIdx(i);  // 重新堆化
                 return;
             }
         JPS_ASSERT(false);  // 期望节点被找到
@@ -789,21 +789,23 @@ private:
         return _storageRef[idxHeap[a]].f > _storageRef[idx].f;
     }
 
+    // 向上堆化
     void _percolateUp(SizeT i) {
-        const SizeT idx = idxHeap[i];
+        const SizeT idx = idxHeap[i]; // 获取堆索引
         SizeT p;
         goto start;
         do {
-            idxHeap[i] = idxHeap[p];  // parent is smaller, move it down
-            i = p;                    // continue with parent
+            idxHeap[i] = idxHeap[p];  // 父节点更小，移动它
+            i = p;                    // 继续使用父节点
         start:
             p = (i - 1) >> 1;
         } while (i && _heapLessIdx(p, idx));
-        idxHeap[i] = idx;  // found correct place for idx
+        idxHeap[i] = idx;  // 找到正确的位置
     }
 
+    // 向下堆化
     void _percolateDown(SizeT i) {
-        const SizeT idx = idxHeap[i];
+        const SizeT idx = idxHeap[i];  // 获取堆索引
         const SizeT sz = idxHeap.size();
         SizeT child;
         goto start;
@@ -880,19 +882,29 @@ protected:
         stepsDone = 0;
     }
 
+    // 扩展节点，思路是：
+    // 1. 计算额外代价
+    // 2. 计算新代价
+    // 3. 如果节点不在开放列表中，或者新代价小于节点代价，则更新节点
+    // 4. 如果节点不在开放列表中，则将节点加入开放列表
+    // 5. 如果节点在开放列表中，则更新节点
+    // 参数：
+    // jp: 目标位置
+    // jn: 目标节点
+    // parent: 父节点
     void _expandNode(const Position jp, Node& jn, const Node& parent) {
-        JPS_ASSERT(jn.pos == jp);
-        ScoreType extraG = JPS_HEURISTIC_ACCURATE(jp, parent.pos);
-        ScoreType newG = parent.g + extraG;
-        if (!jn.isOpen() || newG < jn.g) {
-            jn.g = newG;
-            jn.f = jn.g + JPS_HEURISTIC_ESTIMATE(jp, endPos);
-            jn.setParent(parent);
-            if (!jn.isOpen()) {
-                open.pushNode(&jn);
-                jn.setOpen();
+        JPS_ASSERT(jn.pos == jp);                                   // 确保节点是正确的
+        ScoreType extraG = JPS_HEURISTIC_ACCURATE(jp, parent.pos);  // 计算额外代价
+        ScoreType newG = parent.g + extraG;                         // 计算新代价
+        if (!jn.isOpen() || newG < jn.g) {  // 如果节点不在开放列表中，或者新代价小于节点代价，则更新节点
+            jn.g = newG;                    // 更新节点代价
+            jn.f = jn.g + JPS_HEURISTIC_ESTIMATE(jp, endPos);  // 计算新f值
+            jn.setParent(parent);                              // 设置父节点
+            if (!jn.isOpen()) {      // 如果节点不在开放列表中，则将节点加入开放列表
+                open.pushNode(&jn);  // 将节点加入开放列表
+                jn.setOpen();        // 设置节点为开放
             } else
-                open.fixNode(jn);
+                open.fixNode(jn);  // 如果节点在开放列表中，则更新节点
         }
     }
 

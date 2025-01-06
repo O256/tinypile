@@ -354,6 +354,7 @@ inline static T Abs(T a) {
     return a < T(0) ? -a : a;
 }
 
+// 获取符号
 template <typename T>
 inline static int Sgn(T val) {
     return (T(0) < val) - (val < T(0));
@@ -1358,18 +1359,18 @@ JPS_Result Searcher<GRID>::findPathInit(Position start, Position end, JPS_Flags 
         if (!grid(end.x, end.y))
             return JPS_NO_PATH;
 
-    Node* endNode = getNode(end);  // this might realloc the internal storage...
+    Node* endNode = getNode(end);  // 这可能会重新分配内部存储...
     if (!endNode)
         return JPS_OUT_OF_MEMORY;
-    endNodeIdx = storage.getindex(endNode);  // .. so we keep this for later
+    endNodeIdx = storage.getindex(endNode);  // .. 所以我们保留这个以便稍后使用
 
-    Node* startNode = getNode(start);  // this might also realloc
+    Node* startNode = getNode(start);  // 这可能会重新分配
     if (!startNode)
         return JPS_OUT_OF_MEMORY;
-    endNode = &storage[endNodeIdx];  // startNode is valid, make sure that endNode is valid too in case we reallocated
+    endNode = &storage[endNodeIdx];  // startNode是有效的，确保endNode也是有效的，以防我们重新分配
 
     if (!(flags & JPS_Flag_NoGreedy)) {
-        // Try the quick way out first
+        // 先尝试快速方法
         if (findPathGreedy(startNode, endNode))
             return JPS_FOUND_PATH;
     }
@@ -1401,30 +1402,31 @@ JPS_Result Searcher<GRID>::findPathFinish(PV& path, unsigned step) const {
     return this->generatePath(path, step);
 }
 
+// 贪心算法
 template <typename GRID>
 bool Searcher<GRID>::findPathGreedy(Node* n, Node* endnode) {
-    Position midpos = npos;
-    PosType x = n->pos.x;
-    PosType y = n->pos.y;
-    const Position endpos = endnode->pos;
+    Position midpos = npos; // 中间位置
+    PosType x = n->pos.x; // 起始位置x
+    PosType y = n->pos.y; // 起始位置y
+    const Position endpos = endnode->pos; // 目标位置
 
-    JPS_ASSERT(x != endpos.x || y != endpos.y);  // must not be called when start==end
-    JPS_ASSERT(n != endnode);
+    JPS_ASSERT(x != endpos.x || y != endpos.y);  // 起始位置和目标位置不能相同
+    JPS_ASSERT(n != endnode); // 起始节点和目标节点不能相同
 
-    int dx = int(endpos.x - x);
-    int dy = int(endpos.y - y);
-    const int adx = Abs(dx);
-    const int ady = Abs(dy);
-    dx = Sgn(dx);
-    dy = Sgn(dy);
+    int dx = int(endpos.x - x); // 目标位置x - 起始位置x
+    int dy = int(endpos.y - y); // 目标位置y - 起始位置y
+    const int adx = Abs(dx); // 目标位置x - 起始位置x的绝对值
+    const int ady = Abs(dy); // 目标位置y - 起始位置y的绝对值
+    dx = Sgn(dx); // 目标位置x - 起始位置x的符号
+    dy = Sgn(dy); // 目标位置y - 起始位置y的符号
 
-    // go diagonally first
+    // 首先沿对角线移动
     if (x != endpos.x && y != endpos.y) {
-        JPS_ASSERT(dx && dy);
-        const int minlen = Min(adx, ady);
-        const PosType tx = x + dx * minlen;
+        JPS_ASSERT(dx && dy); // 确保dx和dy不为0，为0则表示在同一行或同一列
+        const int minlen = Min(adx, ady); // 取dx和dy的最小值
+        const PosType tx = x + dx * minlen; // 计算目标位置x
         while (x != tx) {
-            if (grid(x, y) && (grid(x + dx, y) || grid(x, y + dy)))  // prevent tunneling as well
+            if (grid(x, y) && (grid(x + dx, y) || grid(x, y + dy)))  // 防止穿墙
             {
                 x += dx;
                 y += dy;
@@ -1438,7 +1440,7 @@ bool Searcher<GRID>::findPathGreedy(Node* n, Node* endnode) {
         midpos = Pos(x, y);
     }
 
-    // at this point, we're aligned to at least one axis
+    // 此时，我们沿至少一个轴对齐
     JPS_ASSERT(x == endpos.x || y == endpos.y);
 
     if (!(x == endpos.x && y == endpos.y)) {
@@ -1455,10 +1457,10 @@ bool Searcher<GRID>::findPathGreedy(Node* n, Node* endnode) {
 
     if (midpos.isValid()) {
         const unsigned nidx = storage.getindex(n);
-        Node* mid = getNode(midpos);  // this might invalidate n, endnode
+        Node* mid = getNode(midpos);  // 这个可能会使n和endnode失效
         if (!mid)
             return false;
-        n = &storage[nidx];  // reload pointers
+        n = &storage[nidx];  // 重新加载指针
         endnode = &storage[endNodeIdx];
         JPS_ASSERT(mid && mid != n);
         mid->setParent(*n);

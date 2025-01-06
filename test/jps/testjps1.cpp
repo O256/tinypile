@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 	}
 
 	unsigned step = argc > 1 ? atoi(argv[1]) : 0;
-	std::cout << "Calculating path with step " << step << std::endl;
+	std::cout << "Calculating path with step " << step << std::endl; 
 
 	JPS::PathVector path;
     JPS::Searcher<MyGrid> search(grid);

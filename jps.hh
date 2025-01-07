@@ -867,7 +867,7 @@ Position Searcher<GRID>::jumpP(const Position& p, const Position& src) {
     else if (dx)
         return jumpX(p, dx); // 跳跃x轴
     else if (dy)
-        return jumpY(p, dy); // 跳跃y轴
+        return jumpY(p, dy);
     // not reached
     JPS_ASSERT(false);
     return npos;
